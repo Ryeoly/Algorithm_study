@@ -1,39 +1,9 @@
-# import sys
-#
-# N, M, K, X = map(int, sys.stdin.readline().split())
-# arr = [[0]*(N+1) for _ in range(N+1)]
-# distance = [0] * (N+1)
-# for i in range(M):
-#     a, b = map(int, sys.stdin.readline().split())
-#     arr[a][b] = 1
-#
-# for i in range(M+1):
-#     temp = arr[X].copy()
-#     for p in range(N+1):
-#         if arr[X][p] > 0:
-#             for q in range(N+1):
-#                 if arr[X][q] == 0 and arr[p][q] > 0:
-#                     arr[X][q] = arr[X][p]+arr[p][q]
-#
-#     if temp == arr[X]:
-#         break
-#
-# result = list()
-# for i in range(N+1):
-#     if arr[X][i] == K:
-#         result.append(i)
-# if len(result) == 0:
-#     print(-1)
-# else:
-#     for i in result:
-#         print(i)
-#
+from collections import deque
+import sys
+import heapq
 
 # bfs
-from collections import deque
-
-
-def solution(n, m, k, x, arr):
+def solution(n, k, x, arr):
     distance = [-1] * (n + 1)
     distance[x] = 0
 
@@ -56,10 +26,49 @@ def solution(n, m, k, x, arr):
     if evidence == -1:
         print(-1)
 
-n, m, k, x = map(int, input().split())
+n, m, k, x = map(int, sys.stdin.readline().split())
 arr = [[] for _ in range(n+1)]
 for i in range(m):
-    a, b = map(int, input().split())
+    a, b = map(int, sys.stdin.readline().split())
     arr[a].append(b)
 
-solution(n, m, k, x, arr)
+solution(n, k, x, arr)
+
+
+
+# dijkstra
+def solution(n, k, x, arr):
+    distance = [int(1e9)]*(n+1)
+    distance[x] = 0
+    que = list()
+
+    heapq.heappush(que,(0,x))
+
+    while que:
+        dis, now = heapq.heappop(que)
+        if distance[now] < dis:
+            continue
+        for i in arr[now]:
+            cost = dis + i[1]
+            if cost < distance[i[0]]:
+                distance[i[0]] = cost
+                heapq.heappush(que,(cost,i[0]))
+
+    evidence = False
+    for i in range(1, n+1):
+        if distance[i] == k:
+            print(i)
+            evidence = True
+
+    if evidence == False:
+        print(-1)
+
+
+n, m, k, x = map(int, sys.stdin.readline().split())
+arr = [[] for _ in range(n+1)]
+for i in range(m):
+    a, b = map(int, sys.stdin.readline().split())
+    arr[a].append((b,1))
+
+solution(n, k, x, arr)
+
